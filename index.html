@@ -116,7 +116,20 @@ const platforms=[
 let currentCompany='Автосервис Пример',currentCity='Нижний Новгород',currentQuery='Автосервис Пример';
 const fmt=n=>Math.round(Number(n)||0).toLocaleString('ru-RU');
 const money=n=>fmt(n)+' ₽';
-function rowHtml(p,full=false){return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${p.data}</td>`:''}<td><span class="status ${p.status}"><span class="dot"></span>${p.statusText}</span></td>${full?'':`<td class="smallmuted">${p.data}</td>`}<td><a class="link" href="${p.publicUrl}" target="_blank" rel="noopener">Профиль ↗</a> <a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a></td></tr>`}
+function platformSearchUrl(p){
+ const company=(document.getElementById('query')?.value||currentQuery||'').trim();
+ const city=(document.getElementById('city')?.value||currentCity||'').trim();
+ const q=(company+' '+city).trim();
+ const enc=encodeURIComponent(q);
+ if(p.name==='2ГИС')return 'https://2gis.ru/search/'+enc;
+ if(p.name==='Яндекс Карты')return 'https://yandex.ru/maps/?text='+enc;
+ if(p.name==='Яндекс Директ')return 'https://yandex.ru/search/?text='+encodeURIComponent('вход в Яндекс Директ '+company);
+ if(p.name==='Яндекс Бизнес')return 'https://yandex.ru/search/?text='+encodeURIComponent('Яндекс Бизнес компания '+q);
+ if(p.name==='VK')return 'https://vk.com/search?c[q]='+encodeURIComponent(company)+'&c[section]=communities';
+ if(p.name==='Сайт компании')return 'https://yandex.ru/search/?text='+encodeURIComponent('site:'+company+' '+city);
+ return 'https://yandex.ru/search/?text='+encodeURIComponent(company+' '+city+' '+p.name);
+}
+function rowHtml(p,full=false){const searchUrl=platformSearchUrl(p);return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${p.data}</td>`:''}<td><span class="status ${p.status}"><span class="dot"></span>${p.statusText}</span></td>${full?'':`<td class="smallmuted">${p.data}</td>`}<td><a class="link" href="${searchUrl}" target="_blank" rel="noopener">Найти компанию ↗</a> <a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a></td></tr>`}
 function renderRows(){document.getElementById('platformRows').innerHTML=platforms.slice(0,5).map(p=>rowHtml(p)).join('');document.getElementById('allPlatformRows').innerHTML=platforms.map(p=>rowHtml(p,true)).join('');document.getElementById('connectionRows').innerHTML=platforms.map(p=>`<div class="insight"><div class="picon">${p.short}</div><div style="flex:1"><strong>${p.name}</strong><p>${p.data} · ${p.statusText}</p></div><a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Открыть кабинет ↗</a></div>`).join('')}
 function bars(target,metric='spend'){let values=platforms.filter(p=>p[metric]>0);let max=Math.max(...values.map(p=>p[metric]),1);document.getElementById(target).innerHTML=values.map(p=>`<div class="barrow"><div class="barlabel">${p.name}</div><div class="bartrack"><div class="bar" style="width:${p[metric]/max*100}%"></div></div><div class="barvalue">${metric==='spend'?fmt(p[metric]/1000)+'к':fmt(p[metric])}</div></div>`).join('')}
 function renderInsights(){document.getElementById('insights').innerHTML=`<div class="insight"><div class="insighticon">⌕</div><div><strong>Сначала подтвердите найденные профили</strong><p>Используйте поиск по площадкам и добавьте проверенные публичные ссылки в реестр компании.</p></div></div><div class="insight"><div class="insighticon">⇄</div><div><strong>Затем подключите источники данных</strong><p>Закрытая статистика появится только после авторизации через разрешённый API или импорта отчёта.</p></div></div><div class="insight"><div class="insighticon">!</div><div><strong>Аналитика пока пуста</strong><p>Показатели не подставляются автоматически без источника — так мы не выдаём демонстрационные числа за реальные.</p></div></div>`}
@@ -151,7 +164,7 @@ function buildSearchLinks(){
  if(!val)return;
  const q=(type==='site' ? val.replace(/^https?:\/\//,'').replace(/\/.*$/,'') : val) + ' ' + city;
  currentQuery=val;currentCity=city||'Город не указан';currentCompany=type==='site'?val.replace(/^https?:\/\//,'').replace(/\/.*$/,''):val;
- document.getElementById('companyCaption').textContent=currentCompany+' · '+currentCity;
+ document.getElementById('companyCaption').textContent=currentCompany+' · '+currentCity;renderRows();
  const searches=[
   ['Яндекс: общий поиск','https://yandex.ru/search/?text='+encodeURIComponent(q)],
   ['Google: общий поиск','https://www.google.com/search?q='+encodeURIComponent(q)],
@@ -171,14 +184,14 @@ async function runBackendSearch(){
  const type=document.getElementById('searchType').value,val=document.getElementById('query').value.trim(),city=document.getElementById('city').value.trim();
  if(!val)return;
  const box=document.getElementById('liveSearchResults'),status=document.getElementById('searchStatus');
- status.textContent='Запрашиваем поисковый backend…';box.innerHTML='';
+ status.textContent='Ищем компанию в публичном веб-поиске…';box.innerHTML='<div class="smallmuted">Проверяем доступность поискового источника. Совпадения будут показаны как кандидаты, не как подтверждённые профили.</div>';
  try{
   const data=await api('/api/search',{method:'POST',body:JSON.stringify({type,query:val,city})});
   status.textContent=data.message||'Поиск завершён';
   if(data.results&&data.results.length){
    box.innerHTML='<div class="subhead">Результаты внешнего поиска — проверьте совпадение вручную</div>'+data.results.map((r,i)=>`<div class="insight"><div class="insighticon">${i+1}</div><div style="flex:1"><strong>${escapeHtml(r.title||r.url||'Результат')}</strong><p>${escapeHtml(r.description||r.url||'')}</p><a class="link" href="${safeUrl(r.url)}" target="_blank" rel="noopener">Открыть источник ↗</a> <button class="btn ghost small" onclick='addSearchResult(${JSON.stringify({title:r.title||"",url:r.url||"",source:r.source||"Поиск"}).replace(/'/g,"&#39;")})'>Добавить в реестр</button></div></div>`).join('');
-  } else {box.innerHTML='<div class="smallmuted">Поисковый API не вернул результатов. Можно воспользоваться поисковыми ссылками выше.</div>'}
- }catch(err){status.textContent='Backend недоступен или поисковый API не настроен.';box.innerHTML='<div class="smallmuted">Проверьте, что сервер запущен. Для автоматической выдачи настройте ключ BRAVE_SEARCH_API_KEY в окружении. Ошибка: '+escapeHtml(err.message)+'</div>'}
+  } else {box.innerHTML='<div class="smallmuted">Автоматическая выдача сейчас недоступна или поиск не нашёл совпадений. Ниже доступны адресные поисковые запросы по введённой компании.</div>'}
+ }catch(err){status.textContent='Не удалось получить результаты автоматически.';box.innerHTML='<div class="smallmuted">'+escapeHtml(err.message)+'<br>Используйте персональные поисковые ссылки по площадкам или попробуйте ещё раз позже.</div>'}
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function safeUrl(v){try{const u=new URL(v);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch(e){return '#'}}
