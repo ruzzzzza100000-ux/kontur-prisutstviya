@@ -11,7 +11,8 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DB_PATH = ROOT / "kontur.db"
+DB_PATH = Path(os.environ.get("DB_PATH", "/tmp/kontur.db")).expanduser().resolve()
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 PORT = int(os.environ.get("PORT", "8765"))
 BRAVE_KEY = os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
 
