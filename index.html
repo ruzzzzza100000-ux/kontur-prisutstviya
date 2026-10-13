@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Контур присутствия — демо</title>
+<style>
+:root{--bg:#0b1020;--panel:#111a2d;--panel2:#16223a;--line:#283653;--text:#edf3ff;--muted:#9cacc7;--blue:#7aa7ff;--green:#6fe0b1;--yellow:#ffd27a;--red:#ff8d9a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#142448 0,#0b1020 46%,#090e1b 100%);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}.sidebar{padding:24px 16px;border-right:1px solid var(--line);background:#0b1324d9}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 26px;font-size:16px;font-weight:800;letter-spacing:-.3px}.logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#7aa7ff,#6fe0b1);display:grid;place-items:center;color:#071224;font-weight:900}.navlabel{color:#637693;font-size:10px;font-weight:800;letter-spacing:1.4px;padding:12px 10px 7px}.nav{display:flex;align-items:center;gap:11px;padding:11px 12px;margin:3px 0;border-radius:10px;color:#a9b9d3;cursor:pointer}.nav.active,.nav:hover{background:#1b2b49;color:#fff}.nav .ni{width:20px;text-align:center;font-size:16px}.sidebottom{position:sticky;top:calc(100vh - 150px);margin-top:44px;padding:14px;background:#111c30;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:12px}.main{padding:28px clamp(16px,3vw,42px) 50px;max-width:1600px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:25px}.eyebrow{color:var(--blue);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.top h1{font-size:clamp(25px,3vw,34px);line-height:1.15;margin:7px 0}.sub{color:var(--muted);max-width:720px}.chip{display:inline-flex;gap:7px;align-items:center;border:1px solid #4a4934;background:#302b1d;color:var(--yellow);padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}.panel{background:linear-gradient(145deg,#121d32,#10192b);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 10px 35px #00000016}.panelhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.panel h2{font-size:16px;margin:0 0 4px}.panel p{margin:0;color:var(--muted);font-size:12px}.searchgrid{display:grid;grid-template-columns:1fr 1fr 1.4fr auto;gap:12px;align-items:end}.field label{display:block;color:#a8b8d2;font-size:11px;font-weight:700;margin-bottom:7px}.field input,.field select{width:100%;min-width:0;background:#0b1426;color:var(--text);border:1px solid #30405e;border-radius:9px;padding:12px 11px;outline:none}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #7aa7ff18}.btn{border:1px solid #3a527b;background:#233a60;color:#fff;padding:11px 15px;border-radius:10px;font-weight:750;white-space:nowrap}.btn.primary{background:linear-gradient(135deg,#7aa7ff,#6490ec);border:0;color:#08152a}.btn.ghost{background:transparent;border-color:#35435c;color:#c7d4e9}.btn.small{padding:7px 10px;font-size:11px}.btn:hover{filter:brightness(1.1)}.searchnote{margin-top:11px;color:#8394b1;font-size:11px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:17px 0}.stat{background:#111b2e;border:1px solid var(--line);padding:17px;border-radius:14px}.stat .label{color:var(--muted);font-size:11px}.stat .num{font-size:26px;font-weight:800;letter-spacing:-.7px;margin:6px 0 3px}.stat .foot{font-size:11px;color:#7f91ad}.green{color:var(--green)!important}.yellow{color:var(--yellow)!important}.blue{color:var(--blue)!important}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.8fr);gap:16px;margin-top:16px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:610px}th{text-align:left;color:#8193b0;font-size:10px;text-transform:uppercase;letter-spacing:.6px;padding:10px 9px;border-bottom:1px solid var(--line)}td{padding:12px 9px;border-bottom:1px solid #24314a;vertical-align:middle}tbody tr:last-child td{border-bottom:0}.platform{display:flex;align-items:center;gap:10px;min-width:155px}.picon{width:33px;height:33px;flex-shrink:0;border-radius:10px;background:#202f4a;display:grid;place-items:center;font-weight:900;font-size:12px;color:#dce8ff}.pname{font-weight:750}.pmeta{color:#8495b0;font-size:10px}.status{display:inline-flex;align-items:center;gap:6px;border-radius:6px;padding:4px 7px;font-size:10px;font-weight:750;white-space:nowrap}.status.found{background:#18392f;color:var(--green)}.status.connect{background:#3a3020;color:var(--yellow)}.status.none{background:#2b3141;color:#b5c2d7}.status .dot{width:5px;height:5px}.link{color:#91b5ff;text-decoration:none;font-size:11px;white-space:nowrap}.link:hover{text-decoration:underline}.numcell{font-variant-numeric:tabular-nums;font-weight:700}.barrow{display:grid;grid-template-columns:95px 1fr 40px;align-items:center;gap:10px;margin:16px 0}.barlabel{font-size:12px;color:#c3d0e5}.bartrack{height:8px;background:#25324a;border-radius:20px;overflow:hidden}.bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#709aff,#71ddb4)}.barvalue{text-align:right;color:#cbd7ea;font-size:11px;font-weight:700}.funnel{display:flex;flex-direction:column;gap:9px;margin-top:17px}.funnelrow{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border-radius:9px;background:#0d1729;border:1px solid #25334c}.funnelrow span{color:#a9b8d0;font-size:12px}.funnelrow strong{font-size:15px}.insight{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid #25334c}.insight:last-child{border-bottom:0;padding-bottom:0}.insighticon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#203452;flex-shrink:0}.insight strong{font-size:12px;display:block;margin-bottom:4px}.insight p{font-size:11px;line-height:1.5}.bottomgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.smalltable{min-width:0}.smalltable td,.smalltable th{padding:10px 8px}.tag{font-size:10px;border:1px solid #30405d;color:#aabbd5;padding:3px 6px;border-radius:6px}.footer{color:#6e819f;font-size:10px;text-align:center;margin-top:22px}.toast{position:fixed;right:22px;bottom:22px;background:#1b2e4a;border:1px solid #48648c;border-radius:12px;padding:13px 17px;box-shadow:0 15px 45px #0007;max-width:350px;z-index:10;display:none}.toast.show{display:block;animation:fade .2s}@keyframes fade{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}.empty{display:none;padding:20px;text-align:center;color:var(--muted)}.section{display:none}.section.active{display:block}.progress{height:5px;border-radius:10px;background:#263650;overflow:hidden;margin-top:12px}.progress div{height:100%;width:0;background:linear-gradient(90deg,#7aa7ff,#6fe0b1);transition:width .35s}.smallmuted{font-size:11px;color:#8c9fbb}.right{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.subhead{font-size:12px;color:#91a4c1;font-weight:750;margin:20px 0 8px}@media(max-width:1100px){.searchgrid{grid-template-columns:1fr 1fr}.searchgrid .field:nth-child(3){grid-column:span 2}.searchgrid button{grid-column:span 2}.layout{grid-template-columns:1fr}.bottomgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.app{grid-template-columns:1fr}.sidebar{position:relative;padding:14px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding-bottom:12px}.navs{display:flex;overflow-x:auto;gap:4px}.navlabel,.sidebottom{display:none}.nav{white-space:nowrap;padding:9px}.main{padding:20px 13px 35px}.top{align-items:flex-start;flex-direction:column}.searchgrid{grid-template-columns:1fr}.searchgrid .field:nth-child(3),.searchgrid button{grid-column:auto}.stats{gap:8px}.stat{padding:13px}.stat .num{font-size:22px}.panel{padding:15px}.bottomgrid{grid-template-columns:1fr}.chip{white-space:normal}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">К</div><div>Контур<span style="color:#7aa7ff">.присутствия</span><div style="font-size:10px;color:#8092af;font-weight:500;letter-spacing:1px;margin-top:1px">DIGITAL INTELLIGENCE</div></div></div>
+  <div class="navlabel">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+  <div class="navs">
+    <div class="nav active" data-section="overview"><span class="ni">▦</span> Обзор</div>
+    <div class="nav" data-section="sources"><span class="ni">⌕</span> Найденные площадки</div>
+    <div class="nav" data-section="analytics"><span class="ni">◷</span> Аналитика</div>
+    <div class="nav" data-section="connections"><span class="ni">⇄</span> Подключения</div>
+    <div class="nav" data-section="reports"><span class="ni">▤</span> Отчёты</div>
+  </div>
+  <div class="sidebottom"><div style="color:#dbe6fa;font-weight:800;margin-bottom:6px">Демо-режим</div>Поиск использует демонстрационный профиль. Внешние площадки не опрашиваются, реальные кабинеты не подключены.<div style="margin-top:10px;color:#6fe0b1">● Локальный прототип</div></div>
+</aside>
+<main class="main">
+  <div class="top"><div><div class="eyebrow">DIGITAL FOOTPRINT SCANNER</div><h1>Цифровое присутствие компании</h1><div class="sub">Найдите публичные профили, соберите ссылки на кабинеты и сведите доступные маркетинговые данные в одном месте.</div></div><div class="chip"><span class="dot"></span> Данные демонстрационные</div></div>
+  <section id="overview" class="section active">
+    <div class="panel">
+      <div class="panelhead"><div><h2>Найти компанию</h2><p>Введите сайт, телефон или название. Прототип покажет пример результатов поиска.</p></div><span class="tag">Шаг 1 из 3</span></div>
+      <form id="searchForm">
+      <div class="searchgrid">
+        <div class="field"><label for="searchType">Тип идентификатора</label><select id="searchType"><option value="site">Сайт</option><option value="phone">Телефон</option><option value="name">Название компании</option></select></div>
+        <div class="field"><label for="city">Город</label><input id="city" value="Нижний Новгород" placeholder="Город"></div>
+        <div class="field"><label for="query">Данные компании</label><input id="query" value="Автосервис Пример" placeholder="site.ru, +7..., название" required></div>
+        <button class="btn primary" type="submit">⌕ Найти присутствие</button>
+      </div>
+      </form>
+      <div class="searchnote">Поиск выполняется через подключённый поисковый API, если настроен ключ. Без ключа доступны поисковые ссылки и ручное добавление профилей.</div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div class="panelhead"><div><h2>Поиск в публичных источниках</h2><p>Откройте реальные поисковые запросы по компании и добавьте подтверждённые ссылки в реестр.</p></div><span class="tag">Живые ссылки</span></div>
+      <div id="searchLinks" class="right" style="justify-content:flex-start"></div>
+      <div class="searchnote" id="searchStatus">Сначала проверьте результаты, затем добавьте подтверждённые профили в реестр.</div>
+      <div id="liveSearchResults" style="margin-top:12px"></div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <div class="panelhead"><div><h2>Добавить найденную площадку</h2><p>Вставьте ссылку на публичную карточку, сообщество или сайт — она сохранится в этом реестре до закрытия страницы.</p></div></div>
+      <form id="addProfileForm" class="searchgrid" style="grid-template-columns:1fr 1.5fr auto">
+        <div class="field"><label for="profilePlatform">Площадка</label><select id="profilePlatform"><option>2ГИС</option><option>Яндекс Карты</option><option>Яндекс Бизнес</option><option>Яндекс Директ</option><option>VK</option><option>Сайт компании</option><option>Другое</option></select></div>
+        <div class="field"><label for="profileUrl">Ссылка на найденный профиль</label><input id="profileUrl" type="url" placeholder="https://..." required></div>
+        <button class="btn primary" type="submit">+ Добавить</button>
+      </form>
+      <div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>Площадка</th><th>Ссылка</th><th>Действие</th></tr></thead><tbody id="userProfiles"><tr><td colspan="3" class="smallmuted">Пока ничего не добавлено.</td></tr></tbody></table></div>
+    </div>
+    <div class="layout">
+      <div class="panel">
+        <div class="panelhead"><div><h2>Найденные площадки</h2><p id="companyCaption">Автосервис Пример · Нижний Новгород</p></div><button class="btn ghost small" onclick="go('sources')">Все площадки ↗</button></div>
+        <div class="tablewrap"><table><thead><tr><th>Площадка</th><th>Статус</th><th>Данные</th><th>Ссылки</th></tr></thead><tbody id="platformRows"></tbody></table></div>
+        <div class="empty" id="noRows">Нет результатов для отображения.</div>
+      </div>
+      <div class="panel">
+        <div class="panelhead"><div><h2>Сводка по каналам</h2><p>Показатели появятся после подключения источников</p></div><span class="tag">Нет данных</span></div>
+        <div class="empty" style="display:block">Пока нет подтверждённых расходов, кликов, лидов или продаж. Найденные публичные профили сами по себе не дают доступ к статистике кабинетов.</div>
+        <div class="funnel">
+          <div class="funnelrow"><span>Профили для проверки</span><strong>—</strong></div>
+          <div class="funnelrow"><span>Импортированные лиды</span><strong>—</strong></div>
+          <div class="funnelrow"><span>Продажи из CRM</span><strong>—</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottomgrid">
+      <div class="panel"><div class="panelhead"><div><h2>AI-инсайты</h2><p>Пример автоматических выводов на основе демоданных</p></div><span class="tag">AI · DEMO</span></div><div id="insights"></div></div>
+      <div class="panel"><div class="panelhead"><div><h2>Следующие шаги</h2><p>Что потребуется для реального запуска</p></div></div>
+        <div class="insight"><div class="insighticon">1</div><div><strong>Подтвердить найденные профили</strong><p>Сопоставить сайт, телефон, адрес и название, чтобы не объединить разные компании.</p></div></div>
+        <div class="insight"><div class="insighticon">2</div><div><strong>Авторизовать источники</strong><p>Подключить официальные API, OAuth или загрузить отчёты из кабинетов.</p></div></div>
+        <div class="insight"><div class="insighticon">3</div><div><strong>Связать лиды с продажами</strong><p>Для сквозной аналитики нужны CRM, телефония, UTM-метки или импорт офлайн-конверсий.</p></div></div>
+      </div>
+    </div>
+  </section>
+  <section id="sources" class="section">
+    <div class="panel"><div class="panelhead"><div><h2>Каталог площадок для проверки</h2><p>Ссылки для ручной проверки и официальные входы в кабинеты. Реальные совпадения ещё не подтверждены.</p></div><button class="btn ghost small" onclick="exportCSV()">Экспорт CSV</button></div><div class="tablewrap"><table><thead><tr><th>Площадка</th><th>Что найдено</th><th>Статус данных</th><th>Публичный профиль</th><th>Вход в кабинет</th></tr></thead><tbody id="allPlatformRows"></tbody></table></div></div>
+    <div class="panel" style="margin-top:16px"><h2>Правила сопоставления</h2><p style="margin-top:7px">Автоматический поиск может выдавать похожие компании. Для надёжного объединения проверяются домен, телефон, название, адрес и идентификаторы площадок. Неоднозначные совпадения должны подтверждаться человеком.</p></div>
+  </section>
+  <section id="analytics" class="section">
+    <div class="panel"><div class="panelhead"><div><h2>Единая маркетинговая аналитика</h2><p>Демонстрационный сводный отчёт по подключённым каналам.</p></div><div class="right"><select id="periodSelect" class="field input" style="background:#0b1426;color:#edf3ff;border:1px solid #30405e;padding:9px;border-radius:8px" onchange="updatePeriod()"><option value="30">Последние 30 дней</option><option value="7">Последние 7 дней</option><option value="90">Последние 90 дней</option></select><button class="btn small" onclick="exportCSV()">Скачать CSV</button></div></div>
+    <div class="panel" style="margin-bottom:16px;background:#101a2c">
+      <h2>Данные пока не подключены</h2>
+      <p style="margin-top:6px">Здесь появятся расходы, клики, лиды и продажи после авторизации в рекламных кабинетах или импорта отчётов. Мы не показываем выдуманные KPI как реальные данные.</p>
+    </div>
+    <div class="layout"><div class="panel"><h2>Расходы по каналам</h2><p style="margin-top:4px">График заполнится после подключения данных</p><div id="analyticsBars"><div class="empty" style="display:block">Нет импортированных расходов.</div></div></div><div class="panel"><h2>Воронка</h2><p style="margin-top:4px">От перехода до продажи</p><div class="funnel"><div class="funnelrow"><span>Клики / визиты</span><strong id="fClicks">—</strong></div><div class="funnelrow"><span>Лиды</span><strong id="fLeads">—</strong></div><div class="funnelrow"><span>Продажи</span><strong id="fSales">—</strong></div><div class="funnelrow"><span>Конверсия лид → продажа</span><strong id="fConv">—</strong></div></div></div></div>
+    </div>
+  </section>
+  <section id="connections" class="section">
+    <div class="panel"><div class="panelhead"><div><h2>Подключения и доступы</h2><p>Статус локального backend и доступность поиска.</p></div><span class="tag" id="backendStatus">Проверка…</span></div><div id="connectionRows"></div><div class="subhead">Импорт отчёта (демо)</div><div class="field"><label for="csvFile">Выберите CSV-файл с колонками: channel, spend, clicks, leads, sales</label><input type="file" id="csvFile" accept=".csv,text/csv"></div><p id="importResult" style="margin-top:10px"></p></div>
+    <div class="panel" style="margin-top:16px"><h2>Ограничения доступа</h2><p style="margin-top:7px">Публичный профиль обычно можно обнаружить без входа. Закрытая статистика рекламного кабинета доступна только после подтверждённой авторизации и при наличии соответствующих разрешений API. Прототип не собирает пароли, не выполняет вход в сторонние кабинеты и не обходит ограничения площадок.</p></div>
+  </section>
+  <section id="reports" class="section">
+    <div class="panel"><div class="panelhead"><div><h2>Отчёты</h2><p>Сводку можно сохранить как CSV или распечатать в PDF.</p></div></div><div class="right" style="justify-content:flex-start"><button class="btn primary" onclick="exportCSV()">⇩ Скачать CSV</button><button class="btn ghost" onclick="window.print()">▤ Печать / PDF</button></div><div class="subhead">Состав отчёта</div><div class="insight"><div class="insighticon">✓</div><div><strong>Реестр площадок</strong><p>Найденные профили, ссылки, статусы и доступность данных.</p></div></div><div class="insight"><div class="insighticon">✓</div><div><strong>Сводка эффективности</strong><p>Расходы, клики, лиды, продажи, CPL и конверсия по каналам.</p></div></div><div class="insight"><div class="insighticon">✓</div><div><strong>Выводы и ограничения</strong><p>Демо-аналитика не является реальной статистикой рекламных кабинетов.</p></div></div></div>
+  </section>
+  <div class="footer">КОНТУР ПРИСУТСТВИЯ · ЛОКАЛЬНЫЙ MVP · ДАННЫЕ СОХРАНЯЮТСЯ В ЛОКАЛЬНОЙ БАЗЕ НА ВАШЕМ КОМПЬЮТЕРЕ</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const platforms=[
+ {name:'2ГИС',short:'2Г',kind:'Карты и справочник',status:'none',statusText:'Не проверено',data:'Публичный профиль',publicUrl:'https://2gis.ru/',loginUrl:'https://reklama.2gis.ru/',spend:0,clicks:0,leads:0,sales:0},
+ {name:'Яндекс Карты',short:'Я',kind:'Карты и карточка',status:'none',statusText:'Не проверено',data:'Публичная карточка',publicUrl:'https://yandex.ru/maps/',loginUrl:'https://business.yandex.ru/',spend:0,clicks:780,leads:64,sales:18},
+ {name:'Яндекс Директ',short:'Д',kind:'Контекстная реклама',status:'connect',statusText:'Нужна авторизация',data:'Нужен доступ к статистике',publicUrl:'https://direct.yandex.ru/',loginUrl:'https://direct.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
+ {name:'Яндекс Бизнес',short:'Б',kind:'Реклама и карточка',status:'connect',statusText:'Нужна авторизация',data:'Нужен доступ к статистике',publicUrl:'https://business.yandex.ru/',loginUrl:'https://business.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
+ {name:'VK',short:'VK',kind:'Сообщество / реклама',status:'none',statusText:'Не проверено',data:'Публичная страница',publicUrl:'https://vk.com/',loginUrl:'https://ads.vk.com/',spend:0,clicks:0,leads:0,sales:0},
+ {name:'Сайт компании',short:'WWW',kind:'Сайт и веб-аналитика',status:'none',statusText:'Не проверено',data:'Нужен счётчик / доступ',publicUrl:'https://example.com/',loginUrl:'https://metrika.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
+ {name:'CRM / телефония',short:'CRM',kind:'Заявки и продажи',status:'none',statusText:'Не обнаружено',data:'Нужна интеграция',publicUrl:'https://www.bitrix24.ru/',loginUrl:'https://www.bitrix24.ru/',spend:0,clicks:0,leads:0,sales:0}
+];
+let currentCompany='Автосервис Пример',currentCity='Нижний Новгород',currentQuery='Автосервис Пример';
+const fmt=n=>Math.round(n).toLocaleString('ru-RU');
+const money=n=>fmt(n)+' ₽';
+function rowHtml(p,full=false){return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${p.data}</td>`:''}<td><span class="status ${p.status}"><span class="dot"></span>${p.statusText}</span></td>${full?'':`<td class="smallmuted">${p.data}</td>`}<td><a class="link" href="${p.publicUrl}" target="_blank" rel="noopener">Профиль ↗</a> <a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a></td></tr>`}
+function renderRows(){document.getElementById('platformRows').innerHTML=platforms.slice(0,5).map(p=>rowHtml(p)).join('');document.getElementById('allPlatformRows').innerHTML=platforms.map(p=>rowHtml(p,true)).join('');document.getElementById('connectionRows').innerHTML=platforms.map(p=>`<div class="insight"><div class="picon">${p.short}</div><div style="flex:1"><strong>${p.name}</strong><p>${p.data} · ${p.statusText}</p></div><a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Открыть кабинет ↗</a></div>`).join('')}
+function bars(target,metric='spend'){let values=platforms.filter(p=>p[metric]>0);let max=Math.max(...values.map(p=>p[metric]),1);document.getElementById(target).innerHTML=values.map(p=>`<div class="barrow"><div class="barlabel">${p.name}</div><div class="bartrack"><div class="bar" style="width:${p[metric]/max*100}%"></div></div><div class="barvalue">${metric==='spend'?fmt(p[metric]/1000)+'к':fmt(p[metric])}</div></div>`).join('')}
+function renderInsights(){document.getElementById('insights').innerHTML=`<div class="insight"><div class="insighticon">⌕</div><div><strong>Сначала подтвердите найденные профили</strong><p>Используйте поиск по площадкам и добавьте проверенные публичные ссылки в реестр компании.</p></div></div><div class="insight"><div class="insighticon">⇄</div><div><strong>Затем подключите источники данных</strong><p>Закрытая статистика появится только после авторизации через разрешённый API или импорта отчёта.</p></div></div><div class="insight"><div class="insighticon">!</div><div><strong>Аналитика пока пуста</strong><p>Показатели не подставляются автоматически без источника — так мы не выдаём демонстрационные числа за реальные.</p></div></div>`}
+function totals(){let p=platforms.reduce((a,x)=>({spend:a.spend+x.spend,clicks:a.clicks+x.clicks,leads:a.leads+x.leads,sales:a.sales+x.sales}),{spend:0,clicks:0,leads:0,sales:0});return p}
+async function updateAnalytics(){let t;try{t=await api('/api/analytics?days='+Number(document.getElementById('periodSelect')?.value||30))}catch(e){t={spend:0,clicks:0,leads:0,sales:0}}const days=Number(document.getElementById('periodSelect')?.value||30),factor=1;document.getElementById('anSpend').textContent=t.spend?money(t.spend*factor):'—';document.getElementById('anLeads').textContent=t.leads?fmt(t.leads*factor):'—';document.getElementById('anCpl').textContent=t.leads?money(t.spend/t.leads):'—';document.getElementById('anSales').textContent=t.sales?fmt(t.sales*factor):'—';document.getElementById('fClicks').textContent=fmt(t.clicks*factor);document.getElementById('fLeads').textContent=fmt(t.leads*factor);document.getElementById('fSales').textContent=fmt(t.sales*factor);document.getElementById('fConv').textContent=t.leads?(t.sales/t.leads*100).toLocaleString('ru-RU',{maximumFractionDigits:1})+'%':'—';bars('analyticsBars','spend');}
+function go(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));if(id==='analytics')updateAnalytics();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>go(n.dataset.section)));
+function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+function buildSearchLinks(){
+ const type=document.getElementById('searchType').value;
+ const val=document.getElementById('query').value.trim();
+ const city=document.getElementById('city').value.trim();
+ if(!val)return;
+ const q=(type==='site' ? val.replace(/^https?:\/\//,'').replace(/\/.*$/,'') : val) + ' ' + city;
+ currentQuery=val;currentCity=city||'Город не указан';currentCompany=type==='site'?val.replace(/^https?:\/\//,'').replace(/\/.*$/,''):val;
+ document.getElementById('companyCaption').textContent=currentCompany+' · '+currentCity;
+ const searches=[
+  ['Яндекс: общий поиск','https://yandex.ru/search/?text='+encodeURIComponent(q)],
+  ['Google: общий поиск','https://www.google.com/search?q='+encodeURIComponent(q)],
+  ['2ГИС','https://www.google.com/search?q='+encodeURIComponent('site:2gis.ru '+q)],
+  ['Яндекс Карты / Бизнес','https://yandex.ru/search/?text='+encodeURIComponent('site:yandex.ru/maps '+q+' OR site:business.yandex.ru '+q)],
+  ['Яндекс Директ','https://yandex.ru/search/?text='+encodeURIComponent('Яндекс Директ рекламный кабинет '+q)],
+  ['VK','https://yandex.ru/search/?text='+encodeURIComponent('site:vk.com '+q)],
+  ['Сайт / веб-аналитика','https://yandex.ru/search/?text='+encodeURIComponent(q+' сайт метрика')]
+ ];
+ document.getElementById('searchLinks').innerHTML=searches.map(([label,url])=>`<a class="btn ghost small" style="text-decoration:none" target="_blank" rel="noopener" href="${url}">${label} ↗</a>`).join('');
+ document.getElementById('progressBar').style.width='100%';
+ toast('Сформированы реальные поисковые запросы. Откройте результаты и добавьте подтверждённые ссылки вручную.');
+ setTimeout(()=>document.getElementById('progressBar').style.width='0',1200);
+}
+async function api(path,opts={}){const r=await fetch(path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});if(!r.ok)throw new Error((await r.text())||('HTTP '+r.status));return r.json()}
+async function runBackendSearch(){
+ const type=document.getElementById('searchType').value,val=document.getElementById('query').value.trim(),city=document.getElementById('city').value.trim();
+ if(!val)return;
+ const box=document.getElementById('liveSearchResults'),status=document.getElementById('searchStatus');
+ status.textContent='Запрашиваем поисковый backend…';box.innerHTML='';
+ try{
+  const data=await api('/api/search',{method:'POST',body:JSON.stringify({type,query:val,city})});
+  status.textContent=data.message||'Поиск завершён';
+  if(data.results&&data.results.length){
+   box.innerHTML='<div class="subhead">Результаты внешнего поиска — проверьте совпадение вручную</div>'+data.results.map((r,i)=>`<div class="insight"><div class="insighticon">${i+1}</div><div style="flex:1"><strong>${escapeHtml(r.title||r.url||'Результат')}</strong><p>${escapeHtml(r.description||r.url||'')}</p><a class="link" href="${safeUrl(r.url)}" target="_blank" rel="noopener">Открыть источник ↗</a> <button class="btn ghost small" onclick='addSearchResult(${JSON.stringify({title:r.title||"",url:r.url||"",source:r.source||"Поиск"}).replace(/'/g,"&#39;")})'>Добавить в реестр</button></div></div>`).join('');
+  } else {box.innerHTML='<div class="smallmuted">Поисковый API не вернул результатов. Можно воспользоваться поисковыми ссылками выше.</div>'}
+ }catch(err){status.textContent='Backend недоступен или поисковый API не настроен.';box.innerHTML='<div class="smallmuted">Проверьте, что сервер запущен. Для автоматической выдачи настройте ключ BRAVE_SEARCH_API_KEY в окружении. Ошибка: '+escapeHtml(err.message)+'</div>'}
+}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeUrl(v){try{const u=new URL(v);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch(e){return '#'}}
+async function addSearchResult(r){try{const platform=guessPlatform(r.url);await api('/api/profiles',{method:'POST',body:JSON.stringify({platform,name:r.title,url:r.url,source:r.source,company:currentCompany,city:currentCity})});await loadProfiles();toast('Ссылка сохранена в локальную базу. Проверьте совпадение вручную.')}catch(e){toast('Не удалось сохранить ссылку: '+e.message)}}
+function guessPlatform(url){const u=String(url).toLowerCase();if(u.includes('2gis'))return '2ГИС';if(u.includes('yandex')||u.includes('ya.ru'))return 'Яндекс';if(u.includes('vk.com'))return 'VK';return 'Сайт / другое'}
+document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();buildSearchLinks();runBackendSearch()});
+document.getElementById('addProfileForm').addEventListener('submit',async e=>{
+ e.preventDefault();const name=document.getElementById('profilePlatform').value;const url=document.getElementById('profileUrl').value.trim();
+ try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))throw new Error('bad');}catch(_){toast('Введите корректную ссылку с https://');return}
+ try{await api('/api/profiles',{method:'POST',body:JSON.stringify({platform:name,name:name,url,source:'Ручное добавление',company:currentCompany,city:currentCity})});document.getElementById('profileUrl').value='';await loadProfiles();toast('Ссылка сохранена в локальную базу.')}catch(err){toast('Backend недоступен. Запустите сервер из комплекта проекта.')}
+});
+function updatePeriod(){updateAnalytics();toast('Период аналитики обновлён по импортированным данным.')}
+async function exportCSV(){try{const d=await api('/api/export');const blob=new Blob(['\uFEFF'+d.csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='kontur-prisutstviya.csv';a.click();URL.revokeObjectURL(url);toast('CSV выгружен из локальной базы')}catch(e){toast('Запустите backend, чтобы выгрузить актуальные данные')}}
+document.getElementById('csvFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const result=await api('/api/import',{method:'POST',body:JSON.stringify({filename:file.name,csv:String(reader.result||'')})});document.getElementById('importResult').textContent=`Импортировано строк: ${result.imported}. Данные сохранены в локальной базе.`;toast('Импорт завершён')}catch(err){document.getElementById('importResult').textContent='Не удалось импортировать: '+err.message}};reader.readAsText(file)});
+renderRows();renderInsights();updateAnalytics();buildSearchLinks();
+async function loadProfiles(){try{const d=await api('/api/profiles');const tbody=document.getElementById('userProfiles');if(!d.profiles.length){tbody.innerHTML='<tr><td colspan="3" class="smallmuted">Пока ничего не добавлено.</td></tr>';return}tbody.innerHTML=d.profiles.map(p=>`<tr><td>${escapeHtml(p.platform||'Другое')}</td><td><a class="link" href="${safeUrl(p.url)}" target="_blank" rel="noopener">${escapeHtml(p.url)}</a></td><td><button class="btn ghost small" onclick="deleteProfile(${p.id})">Удалить</button></td></tr>`).join('')}catch(e){}}
+async function deleteProfile(id){try{await api('/api/profiles/'+id,{method:'DELETE'});await loadProfiles();toast('Профиль удалён')}catch(e){toast('Не удалось удалить профиль')}}
+async function checkBackend(){try{const d=await api('/api/health');document.getElementById('backendStatus').textContent=d.search_configured?'Backend работает · поиск подключён':'Backend работает · нужен API-ключ';document.getElementById('searchStatus').textContent=d.search_configured?'Сервер готов к поиску через Brave Search API.':'Сервер работает; автоматический поиск включится после настройки BRAVE_SEARCH_API_KEY.'}catch(e){document.getElementById('backendStatus').textContent='Backend не запущен';document.getElementById('searchStatus').textContent='Запустите run_windows.bat или python server.py, чтобы включить серверные функции.'}}
+loadProfiles();checkBackend();
+</script>
+</body>
+</html>

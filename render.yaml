@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: kontur-prisutstviya-demo
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: echo "No external packages required"
+    startCommand: python server.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: BRAVE_SEARCH_API_KEY
+        sync: false
