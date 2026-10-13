@@ -27,17 +27,18 @@
   <div class="top"><div><div class="eyebrow">DIGITAL FOOTPRINT SCANNER</div><h1>Цифровое присутствие компании</h1><div class="sub">Найдите публичные профили, соберите ссылки на кабинеты и сведите доступные маркетинговые данные в одном месте.</div></div><div class="chip"><span class="dot"></span> Данные демонстрационные</div></div>
   <section id="overview" class="section active">
     <div class="panel">
-      <div class="panelhead"><div><h2>Найти компанию</h2><p>Введите сайт, телефон или название. Прототип покажет пример результатов поиска.</p></div><span class="tag">Шаг 1 из 3</span></div>
+      <div class="panelhead"><div><h2>Найти компанию</h2><p>Для сайта прочитаем главную страницу и найдём ссылки на карты, соцсети и счётчики. По названию или телефону откроем поиск по площадкам.</p></div></div>
       <form id="searchForm">
       <div class="searchgrid">
         <div class="field"><label for="searchType">Тип идентификатора</label><select id="searchType"><option value="site">Сайт</option><option value="phone">Телефон</option><option value="name">Название компании</option></select></div>
         <div class="field"><label for="city">Город</label><input id="city" value="Нижний Новгород" placeholder="Город"></div>
-        <div class="field"><label for="query">Данные компании</label><input id="query" value="Автосервис Пример" placeholder="site.ru, +7..., название" required></div>
+        <div class="field"><label for="query">Данные компании</label><input id="query" value="" placeholder="например, site.ru" required></div>
         <button class="btn primary" type="submit">⌕ Найти присутствие</button>
       </div>
       </form>
-      <div class="searchnote">Поиск выполняется через подключённый поисковый API, если настроен ключ. Без ключа доступны поисковые ссылки и ручное добавление профилей.</div>
+      <div class="searchnote">Сайт проверяется без ключей и API. Поиск по названию использует поисковый API, если он настроен; без него доступны ссылки на поиск и ручное добавление.</div>
       <div class="progress"><div id="progressBar"></div></div>
+      <div id="scanResults" style="margin-top:14px"></div>
     </div>
     <div class="panel" style="margin-top:16px">
       <div class="panelhead"><div><h2>Поиск в публичных источниках</h2><p>Откройте реальные поисковые запросы по компании и добавьте подтверждённые ссылки в реестр.</p></div><span class="tag">Живые ссылки</span></div>
@@ -56,7 +57,7 @@
     </div>
     <div class="layout">
       <div class="panel">
-        <div class="panelhead"><div><h2>Найденные площадки</h2><p id="companyCaption">Автосервис Пример · Нижний Новгород</p></div><button class="btn ghost small" onclick="go('sources')">Все площадки ↗</button></div>
+        <div class="panelhead"><div><h2>Найденные площадки</h2><p id="companyCaption">Введите сайт или название выше</p></div><button class="btn ghost small" onclick="go('sources')">Все площадки ↗</button></div>
         <div class="tablewrap"><table><thead><tr><th>Площадка</th><th>Статус</th><th>Данные</th><th>Ссылки</th></tr></thead><tbody id="platformRows"></tbody></table></div>
         <div class="empty" id="noRows">Нет результатов для отображения.</div>
       </div>
@@ -70,9 +71,8 @@
         </div>
       </div>
     </div>
-    <div class="bottomgrid">
-      <div class="panel"><div class="panelhead"><div><h2>AI-инсайты</h2><p>Пример автоматических выводов на основе демоданных</p></div><span class="tag">AI · DEMO</span></div><div id="insights"></div></div>
-      <div class="panel"><div class="panelhead"><div><h2>Следующие шаги</h2><p>Что потребуется для реального запуска</p></div></div>
+    <div class="bottomgrid" style="grid-template-columns:1fr">
+            <div class="panel"><div class="panelhead"><div><h2>Следующие шаги</h2><p>Что потребуется для реального запуска</p></div></div>
         <div class="insight"><div class="insighticon">1</div><div><strong>Подтвердить найденные профили</strong><p>Сопоставить сайт, телефон, адрес и название, чтобы не объединить разные компании.</p></div></div>
         <div class="insight"><div class="insighticon">2</div><div><strong>Авторизовать источники</strong><p>Подключить официальные API, OAuth или загрузить отчёты из кабинетов.</p></div></div>
         <div class="insight"><div class="insighticon">3</div><div><strong>Связать лиды с продажами</strong><p>Для сквозной аналитики нужны CRM, телефония, UTM-метки или импорт офлайн-конверсий.</p></div></div>
@@ -113,7 +113,8 @@ const platforms=[
  {name:'Сайт компании',short:'WWW',kind:'Сайт и веб-аналитика',status:'none',statusText:'Не проверено',data:'Нужен счётчик / доступ',publicUrl:'https://example.com/',loginUrl:'https://metrika.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
  {name:'CRM / телефония',short:'CRM',kind:'Заявки и продажи',status:'none',statusText:'Не обнаружено',data:'Нужна интеграция',publicUrl:'https://www.bitrix24.ru/',loginUrl:'https://www.bitrix24.ru/',spend:0,clicks:0,leads:0,sales:0}
 ];
-let currentCompany='Автосервис Пример',currentCity='Нижний Новгород',currentQuery='Автосервис Пример';
+let currentCompany='',currentCity='Нижний Новгород',currentQuery='';
+let scanFound={};
 const fmt=n=>Math.round(Number(n)||0).toLocaleString('ru-RU');
 const money=n=>fmt(n)+' ₽';
 function platformSearchUrl(p){
@@ -129,20 +130,21 @@ function platformSearchUrl(p){
  if(p.name==='Сайт компании')return 'https://yandex.ru/search/?text='+encodeURIComponent('site:'+company+' '+city);
  return 'https://yandex.ru/search/?text='+encodeURIComponent(company+' '+city+' '+p.name);
 }
-function rowHtml(p,full=false){const searchUrl=platformSearchUrl(p);return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${p.data}</td>`:''}<td><span class="status ${p.status}"><span class="dot"></span>${p.statusText}</span></td>${full?'':`<td class="smallmuted">${p.data}</td>`}<td><a class="link" href="${searchUrl}" target="_blank" rel="noopener">Найти компанию ↗</a> <a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a></td></tr>`}
+function rowHtml(p,full=false){
+ const hit=scanFound[p.name];
+ const cls=hit?(hit.cls||'found'):p.status, stText=hit?hit.text:p.statusText, dataText=hit?hit.data:p.data;
+ const hasQuery=(document.getElementById('query')?.value||currentQuery||'').trim().length>0;
+ const links=(hit&&hit.url?`<a class="link" href="${escapeHtml(safeUrl(hit.url))}" target="_blank" rel="noopener">Профиль ↗</a> `:'')
+  +(hasQuery?`<a class="link" href="${escapeHtml(platformSearchUrl(p))}" target="_blank" rel="noopener">Найти компанию ↗</a> `:'')
+  +`<a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a>`;
+ return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${dataText}</td>`:''}<td><span class="status ${cls}"><span class="dot"></span>${stText}</span></td>${full?'':`<td class="smallmuted">${dataText}</td>`}<td>${links}</td></tr>`
+}
 function renderRows(){document.getElementById('platformRows').innerHTML=platforms.slice(0,5).map(p=>rowHtml(p)).join('');document.getElementById('allPlatformRows').innerHTML=platforms.map(p=>rowHtml(p,true)).join('');document.getElementById('connectionRows').innerHTML=platforms.map(p=>`<div class="insight"><div class="picon">${p.short}</div><div style="flex:1"><strong>${p.name}</strong><p>${p.data} · ${p.statusText}</p></div><a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Открыть кабинет ↗</a></div>`).join('')}
-function bars(target,metric='spend'){let values=platforms.filter(p=>p[metric]>0);let max=Math.max(...values.map(p=>p[metric]),1);document.getElementById(target).innerHTML=values.map(p=>`<div class="barrow"><div class="barlabel">${p.name}</div><div class="bartrack"><div class="bar" style="width:${p[metric]/max*100}%"></div></div><div class="barvalue">${metric==='spend'?fmt(p[metric]/1000)+'к':fmt(p[metric])}</div></div>`).join('')}
-function renderInsights(){document.getElementById('insights').innerHTML=`<div class="insight"><div class="insighticon">⌕</div><div><strong>Сначала подтвердите найденные профили</strong><p>Используйте поиск по площадкам и добавьте проверенные публичные ссылки в реестр компании.</p></div></div><div class="insight"><div class="insighticon">⇄</div><div><strong>Затем подключите источники данных</strong><p>Закрытая статистика появится только после авторизации через разрешённый API или импорта отчёта.</p></div></div><div class="insight"><div class="insighticon">!</div><div><strong>Аналитика пока пуста</strong><p>Показатели не подставляются автоматически без источника — так мы не выдаём демонстрационные числа за реальные.</p></div></div>`}
-function totals(){let p=platforms.reduce((a,x)=>({spend:a.spend+x.spend,clicks:a.clicks+x.clicks,leads:a.leads+x.leads,sales:a.sales+x.sales}),{spend:0,clicks:0,leads:0,sales:0});return p}
 async function updateAnalytics(){
  let t;
  try { t=await api('/api/analytics?days='+Number(document.getElementById('periodSelect')?.value||30)); }
  catch(e) { t={spend:0,clicks:0,leads:0,sales:0,channels:[]}; }
  const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
- put('anSpend',t.spend?money(t.spend):'—');
- put('anLeads',t.leads?fmt(t.leads):'—');
- put('anCpl',t.leads?money(t.spend/t.leads):'—');
- put('anSales',t.sales?fmt(t.sales):'—');
  put('fClicks',fmt(t.clicks));
  put('fLeads',fmt(t.leads));
  put('fSales',fmt(t.sales));
@@ -157,7 +159,7 @@ async function updateAnalytics(){
 function go(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));if(id==='analytics')updateAnalytics();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>go(n.dataset.section)));
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
-function buildSearchLinks(){
+function buildSearchLinks(quiet){
  const type=document.getElementById('searchType').value;
  const val=document.getElementById('query').value.trim();
  const city=document.getElementById('city').value.trim();
@@ -177,7 +179,7 @@ function buildSearchLinks(){
  ];
  document.getElementById('searchLinks').innerHTML=searches.map(([label,url])=>`<a class="btn ghost small" style="text-decoration:none" target="_blank" rel="noopener" href="${url}">${label} ↗</a>`).join('');
  document.getElementById('progressBar').style.width='100%';
- toast('Сформированы реальные поисковые запросы. Откройте результаты и добавьте подтверждённые ссылки вручную.');
+ if(!quiet)toast('Ссылки для поиска по площадкам обновлены.');
  setTimeout(()=>document.getElementById('progressBar').style.width='0',1200);
 }
 async function api(path,opts={}){const r=await fetch(path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});if(!r.ok)throw new Error((await r.text())||('HTTP '+r.status));return r.json()}
@@ -190,15 +192,23 @@ async function runBackendSearch(){
   const data=await api('/api/search',{method:'POST',body:JSON.stringify({type,query:val,city})});
   status.textContent=data.message||'Поиск завершён';
   if(data.results&&data.results.length){
-   box.innerHTML='<div class="subhead">Результаты внешнего поиска — проверьте совпадение вручную</div>'+data.results.map((r,i)=>`<div class="insight"><div class="insighticon">${i+1}</div><div style="flex:1"><strong>${escapeHtml(r.title||r.url||'Результат')}</strong><p>${escapeHtml(r.description||r.url||'')}</p><a class="link" href="${safeUrl(r.url)}" target="_blank" rel="noopener">Открыть источник ↗</a> <button class="btn ghost small" onclick='addSearchResult(${JSON.stringify({title:r.title||"",url:r.url||"",source:r.source||"Поиск"}).replace(/'/g,"&#39;")})'>Добавить в реестр</button></div></div>`).join('');
+   box.innerHTML='<div class="subhead">Результаты внешнего поиска — проверьте совпадение вручную</div>'+data.results.map((r,i)=>`<div class="insight"><div class="insighticon">${i+1}</div><div style="flex:1"><strong>${escapeHtml(r.title||r.url||'Результат')}</strong><p>${escapeHtml(r.description||r.url||'')}</p><a class="link" href="${safeUrl(r.url)}" target="_blank" rel="noopener">Открыть источник ↗</a> <button class="btn ghost small" data-add-url="${escapeHtml(r.url||'')}" data-add-title="${escapeHtml(r.title||'')}" data-add-source="${escapeHtml(r.source||'Поиск')}">Добавить в реестр</button></div></div>`).join('');
   } else {box.innerHTML='<div class="smallmuted">Автоматическая выдача сейчас недоступна или поиск не нашёл совпадений. Ниже доступны адресные поисковые запросы по введённой компании.</div>'}
  }catch(err){status.textContent='Не удалось получить результаты автоматически.';box.innerHTML='<div class="smallmuted">'+escapeHtml(err.message)+'<br>Используйте персональные поисковые ссылки по площадкам или попробуйте ещё раз позже.</div>'}
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function safeUrl(v){try{const u=new URL(v);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch(e){return '#'}}
-async function addSearchResult(r){try{const platform=guessPlatform(r.url);await api('/api/profiles',{method:'POST',body:JSON.stringify({platform,name:r.title,url:r.url,source:r.source,company:currentCompany,city:currentCity})});await loadProfiles();toast('Ссылка сохранена в локальную базу. Проверьте совпадение вручную.')}catch(e){toast('Не удалось сохранить ссылку: '+e.message)}}
+async function addSearchResult(r){try{const platform=r.platform||guessPlatform(r.url);await api('/api/profiles',{method:'POST',body:JSON.stringify({platform,name:r.title,url:r.url,source:r.source,company:currentCompany,city:currentCity})});await loadProfiles();toast('Ссылка сохранена в локальную базу. Проверьте совпадение вручную.')}catch(e){toast('Не удалось сохранить ссылку: '+e.message)}}
 function guessPlatform(url){const u=String(url).toLowerCase();if(u.includes('2gis'))return '2ГИС';if(u.includes('yandex')||u.includes('ya.ru'))return 'Яндекс';if(u.includes('vk.com'))return 'VK';return 'Сайт / другое'}
-document.getElementById('searchForm').addEventListener('submit',e=>{e.preventDefault();buildSearchLinks();runBackendSearch()});
+document.getElementById('searchForm').addEventListener('submit',e=>{
+ e.preventDefault();scanFound={};buildSearchLinks(true);
+ const val=document.getElementById('query').value.trim();
+ if(document.getElementById('searchType').value==='site'){
+  document.getElementById('liveSearchResults').innerHTML='';runScan(val);
+ }else{
+  document.getElementById('scanResults').innerHTML='';renderRows();runBackendSearch();
+ }
+});
 document.getElementById('addProfileForm').addEventListener('submit',async e=>{
  e.preventDefault();const name=document.getElementById('profilePlatform').value;const url=document.getElementById('profileUrl').value.trim();
  try{const parsed=new URL(url);if(!['http:','https:'].includes(parsed.protocol))throw new Error('bad');}catch(_){toast('Введите корректную ссылку с https://');return}
@@ -207,7 +217,38 @@ document.getElementById('addProfileForm').addEventListener('submit',async e=>{
 function updatePeriod(){updateAnalytics();toast('Период аналитики обновлён по импортированным данным.')}
 async function exportCSV(){try{const d=await api('/api/export');const blob=new Blob(['\uFEFF'+d.csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='kontur-prisutstviya.csv';a.click();URL.revokeObjectURL(url);toast('CSV выгружен из локальной базы')}catch(e){toast('Запустите backend, чтобы выгрузить актуальные данные')}}
 document.getElementById('csvFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const result=await api('/api/import',{method:'POST',body:JSON.stringify({filename:file.name,csv:String(reader.result||'')})});document.getElementById('importResult').textContent=`Импортировано строк: ${result.imported}. Данные сохранены в базе текущего развёртывания.`;await updateAnalytics();toast('Импорт завершён; аналитика обновлена')}catch(err){document.getElementById('importResult').textContent='Не удалось импортировать: '+err.message}};reader.readAsText(file)});
-renderRows();renderInsights();updateAnalytics();buildSearchLinks();
+
+const PROFILE_ROW={'2ГИС':'2ГИС','Яндекс Карты':'Яндекс Карты','Яндекс Бизнес':'Яндекс Бизнес','VK':'VK'};
+function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
+function apiError(err){try{const j=JSON.parse(err.message);if(j&&j.error)return j.error}catch(_){}return err.message||'Неизвестная ошибка'}
+async function runScan(val){
+ const box=document.getElementById('scanResults'),status=document.getElementById('searchStatus');
+ box.innerHTML='<div class="smallmuted">Читаем главную страницу сайта…</div>';
+ status.textContent='Проверяем сайт компании…';
+ try{
+  const d=await api('/api/scan',{method:'POST',body:JSON.stringify({url:val})});
+  scanFound={};
+  d.profiles.forEach(p=>{const row=PROFILE_ROW[p.platform];if(row&&!scanFound[row])scanFound[row]={url:p.url,text:'Найдено на сайте',data:'Ссылка с сайта компании'}});
+  const ym=d.counters.find(c=>c.type==='Яндекс Метрика');
+  scanFound['Сайт компании']={url:d.site,cls:d.counters.length?'found':'none',text:'Сайт открыт',
+   data:ym?'Метрика № '+ym.id+' · для статистики нужен доступ':(d.counters.length?'Счётчики найдены · нужен доступ':'Счётчики не найдены')};
+  renderRows();
+  const rows=d.profiles.map(p=>`<tr><td>${escapeHtml(p.platform)}</td><td><a class="link" href="${escapeHtml(safeUrl(p.url))}" target="_blank" rel="noopener">${escapeHtml(p.url)}</a></td><td><button class="btn ghost small" data-add-url="${escapeHtml(p.url)}" data-add-title="${escapeHtml(p.platform)}" data-add-platform="${escapeHtml(p.platform)}" data-add-source="Сайт компании">Добавить в реестр</button></td></tr>`).join('');
+  const counters=d.counters.length?d.counters.map(c=>`<span class="tag">${escapeHtml(c.type)}: ${escapeHtml(c.id)}</span>`).join(' '):'<span class="smallmuted">Счётчики не найдены в коде главной страницы.</span>';
+  const phones=d.phones.length?`<div class="subhead">Телефоны на сайте</div><div class="smallmuted">${d.phones.map(escapeHtml).join(', ')}</div>`:'';
+  box.innerHTML=`<div class="subhead">Что нашли на ${escapeHtml(hostOf(d.site))}</div>`
+   +(d.profiles.length?`<div class="tablewrap"><table style="min-width:0"><thead><tr><th>Площадка</th><th>Ссылка</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
+    :'<div class="smallmuted">На главной странице нет ссылок на карты и соцсети. Воспользуйтесь поиском по площадкам ниже или добавьте ссылки вручную.</div>')
+   +`<div class="subhead">Счётчики аналитики</div><div class="right" style="justify-content:flex-start">${counters}</div>`+phones;
+  status.textContent=d.profiles.length?`Найдено ссылок на площадки: ${d.profiles.length}. Они взяты с сайта самой компании, поэтому совпадения надёжнее, чем в поиске.`:'Ссылок на площадки на сайте нет. Проверьте их через поиск ниже.';
+ }catch(err){
+  scanFound={};renderRows();
+  box.innerHTML='<div class="smallmuted">'+escapeHtml(apiError(err))+'</div>';
+  status.textContent='Не удалось проверить сайт.';
+ }
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-add-url]');if(!b)return;addSearchResult({url:b.dataset.addUrl,title:b.dataset.addTitle||'',platform:b.dataset.addPlatform||'',source:b.dataset.addSource||'Поиск'})});
+renderRows();updateAnalytics();buildSearchLinks(true);
 async function loadProfiles(){try{const d=await api('/api/profiles');const tbody=document.getElementById('userProfiles');if(!d.profiles.length){tbody.innerHTML='<tr><td colspan="3" class="smallmuted">Пока ничего не добавлено.</td></tr>';return}tbody.innerHTML=d.profiles.map(p=>`<tr><td>${escapeHtml(p.platform||'Другое')}</td><td><a class="link" href="${safeUrl(p.url)}" target="_blank" rel="noopener">${escapeHtml(p.url)}</a></td><td><button class="btn ghost small" onclick="deleteProfile(${p.id})">Удалить</button></td></tr>`).join('')}catch(e){}}
 async function deleteProfile(id){try{await api('/api/profiles/'+id,{method:'DELETE'});await loadProfiles();toast('Профиль удалён')}catch(e){toast('Не удалось удалить профиль')}}
 async function checkBackend(){try{const d=await api('/api/health');document.getElementById('backendStatus').textContent=d.search_configured?'Backend работает · поиск подключён':'Backend работает · нужен API-ключ';document.getElementById('searchStatus').textContent=d.search_configured?'Сервер готов к поиску через Brave Search API.':'Сервер работает; автоматический поиск включится после настройки BRAVE_SEARCH_API_KEY.'}catch(e){document.getElementById('backendStatus').textContent='Backend не запущен';document.getElementById('searchStatus').textContent='Запустите run_windows.bat или python server.py, чтобы включить серверные функции.'}}
