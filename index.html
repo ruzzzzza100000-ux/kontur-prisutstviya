@@ -21,7 +21,7 @@
     <div class="nav" data-section="connections"><span class="ni">⇄</span> Подключения</div>
     <div class="nav" data-section="reports"><span class="ni">▤</span> Отчёты</div>
   </div>
-  <div class="sidebottom"><div style="color:#dbe6fa;font-weight:800;margin-bottom:6px">Демо-режим</div>Поиск использует демонстрационный профиль. Внешние площадки не опрашиваются, реальные кабинеты не подключены.<div style="margin-top:10px;color:#6fe0b1">● Локальный прототип</div></div>
+  <div class="sidebottom"><div style="color:#dbe6fa;font-weight:800;margin-bottom:6px">Демо-режим</div>Публичный MVP. Автопоиск требует поискового API; статистика площадок — официального доступа или импорта отчёта.<div style="margin-top:10px;color:#6fe0b1">● Публичный MVP</div></div>
 </aside>
 <main class="main">
   <div class="top"><div><div class="eyebrow">DIGITAL FOOTPRINT SCANNER</div><h1>Цифровое присутствие компании</h1><div class="sub">Найдите публичные профили, соберите ссылки на кабинеты и сведите доступные маркетинговые данные в одном месте.</div></div><div class="chip"><span class="dot"></span> Данные демонстрационные</div></div>
@@ -46,7 +46,7 @@
       <div id="liveSearchResults" style="margin-top:12px"></div>
     </div>
     <div class="panel" style="margin-top:16px">
-      <div class="panelhead"><div><h2>Добавить найденную площадку</h2><p>Вставьте ссылку на публичную карточку, сообщество или сайт — она сохранится в этом реестре до закрытия страницы.</p></div></div>
+      <div class="panelhead"><div><h2>Добавить найденную площадку</h2><p>Вставьте ссылку на публичную карточку, сообщество или сайт — она сохранится в базе текущего развёртывания.</p></div></div>
       <form id="addProfileForm" class="searchgrid" style="grid-template-columns:1fr 1.5fr auto">
         <div class="field"><label for="profilePlatform">Площадка</label><select id="profilePlatform"><option>2ГИС</option><option>Яндекс Карты</option><option>Яндекс Бизнес</option><option>Яндекс Директ</option><option>VK</option><option>Сайт компании</option><option>Другое</option></select></div>
         <div class="field"><label for="profileUrl">Ссылка на найденный профиль</label><input id="profileUrl" type="url" placeholder="https://..." required></div>
@@ -99,14 +99,14 @@
   <section id="reports" class="section">
     <div class="panel"><div class="panelhead"><div><h2>Отчёты</h2><p>Сводку можно сохранить как CSV или распечатать в PDF.</p></div></div><div class="right" style="justify-content:flex-start"><button class="btn primary" onclick="exportCSV()">⇩ Скачать CSV</button><button class="btn ghost" onclick="window.print()">▤ Печать / PDF</button></div><div class="subhead">Состав отчёта</div><div class="insight"><div class="insighticon">✓</div><div><strong>Реестр площадок</strong><p>Найденные профили, ссылки, статусы и доступность данных.</p></div></div><div class="insight"><div class="insighticon">✓</div><div><strong>Сводка эффективности</strong><p>Расходы, клики, лиды, продажи, CPL и конверсия по каналам.</p></div></div><div class="insight"><div class="insighticon">✓</div><div><strong>Выводы и ограничения</strong><p>Демо-аналитика не является реальной статистикой рекламных кабинетов.</p></div></div></div>
   </section>
-  <div class="footer">КОНТУР ПРИСУТСТВИЯ · ЛОКАЛЬНЫЙ MVP · ДАННЫЕ СОХРАНЯЮТСЯ В ЛОКАЛЬНОЙ БАЗЕ НА ВАШЕМ КОМПЬЮТЕРЕ</div>
+  <div class="footer">КОНТУР ПРИСУТСТВИЯ · ПУБЛИЧНЫЙ MVP · ДАННЫЕ В ТЕКУЩЕМ РАЗВЁРТЫВАНИИ МОГУТ БЫТЬ ВРЕМЕННЫМИ</div>
 </main>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 const platforms=[
  {name:'2ГИС',short:'2Г',kind:'Карты и справочник',status:'none',statusText:'Не проверено',data:'Публичный профиль',publicUrl:'https://2gis.ru/',loginUrl:'https://reklama.2gis.ru/',spend:0,clicks:0,leads:0,sales:0},
- {name:'Яндекс Карты',short:'Я',kind:'Карты и карточка',status:'none',statusText:'Не проверено',data:'Публичная карточка',publicUrl:'https://yandex.ru/maps/',loginUrl:'https://business.yandex.ru/',spend:0,clicks:780,leads:64,sales:18},
+ {name:'Яндекс Карты',short:'Я',kind:'Карты и карточка',status:'none',statusText:'Не проверено',data:'Публичная карточка',publicUrl:'https://yandex.ru/maps/',loginUrl:'https://business.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
  {name:'Яндекс Директ',short:'Д',kind:'Контекстная реклама',status:'connect',statusText:'Нужна авторизация',data:'Нужен доступ к статистике',publicUrl:'https://direct.yandex.ru/',loginUrl:'https://direct.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
  {name:'Яндекс Бизнес',short:'Б',kind:'Реклама и карточка',status:'connect',statusText:'Нужна авторизация',data:'Нужен доступ к статистике',publicUrl:'https://business.yandex.ru/',loginUrl:'https://business.yandex.ru/',spend:0,clicks:0,leads:0,sales:0},
  {name:'VK',short:'VK',kind:'Сообщество / реклама',status:'none',statusText:'Не проверено',data:'Публичная страница',publicUrl:'https://vk.com/',loginUrl:'https://ads.vk.com/',spend:0,clicks:0,leads:0,sales:0},
@@ -114,14 +114,33 @@ const platforms=[
  {name:'CRM / телефония',short:'CRM',kind:'Заявки и продажи',status:'none',statusText:'Не обнаружено',data:'Нужна интеграция',publicUrl:'https://www.bitrix24.ru/',loginUrl:'https://www.bitrix24.ru/',spend:0,clicks:0,leads:0,sales:0}
 ];
 let currentCompany='Автосервис Пример',currentCity='Нижний Новгород',currentQuery='Автосервис Пример';
-const fmt=n=>Math.round(n).toLocaleString('ru-RU');
+const fmt=n=>Math.round(Number(n)||0).toLocaleString('ru-RU');
 const money=n=>fmt(n)+' ₽';
 function rowHtml(p,full=false){return `<tr><td><div class="platform"><div class="picon">${p.short}</div><div><div class="pname">${p.name}</div><div class="pmeta">${p.kind}</div></div></div></td>${full?`<td>${p.data}</td>`:''}<td><span class="status ${p.status}"><span class="dot"></span>${p.statusText}</span></td>${full?'':`<td class="smallmuted">${p.data}</td>`}<td><a class="link" href="${p.publicUrl}" target="_blank" rel="noopener">Профиль ↗</a> <a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Вход ↗</a></td></tr>`}
 function renderRows(){document.getElementById('platformRows').innerHTML=platforms.slice(0,5).map(p=>rowHtml(p)).join('');document.getElementById('allPlatformRows').innerHTML=platforms.map(p=>rowHtml(p,true)).join('');document.getElementById('connectionRows').innerHTML=platforms.map(p=>`<div class="insight"><div class="picon">${p.short}</div><div style="flex:1"><strong>${p.name}</strong><p>${p.data} · ${p.statusText}</p></div><a class="link" href="${p.loginUrl}" target="_blank" rel="noopener">Открыть кабинет ↗</a></div>`).join('')}
 function bars(target,metric='spend'){let values=platforms.filter(p=>p[metric]>0);let max=Math.max(...values.map(p=>p[metric]),1);document.getElementById(target).innerHTML=values.map(p=>`<div class="barrow"><div class="barlabel">${p.name}</div><div class="bartrack"><div class="bar" style="width:${p[metric]/max*100}%"></div></div><div class="barvalue">${metric==='spend'?fmt(p[metric]/1000)+'к':fmt(p[metric])}</div></div>`).join('')}
 function renderInsights(){document.getElementById('insights').innerHTML=`<div class="insight"><div class="insighticon">⌕</div><div><strong>Сначала подтвердите найденные профили</strong><p>Используйте поиск по площадкам и добавьте проверенные публичные ссылки в реестр компании.</p></div></div><div class="insight"><div class="insighticon">⇄</div><div><strong>Затем подключите источники данных</strong><p>Закрытая статистика появится только после авторизации через разрешённый API или импорта отчёта.</p></div></div><div class="insight"><div class="insighticon">!</div><div><strong>Аналитика пока пуста</strong><p>Показатели не подставляются автоматически без источника — так мы не выдаём демонстрационные числа за реальные.</p></div></div>`}
 function totals(){let p=platforms.reduce((a,x)=>({spend:a.spend+x.spend,clicks:a.clicks+x.clicks,leads:a.leads+x.leads,sales:a.sales+x.sales}),{spend:0,clicks:0,leads:0,sales:0});return p}
-async function updateAnalytics(){let t;try{t=await api('/api/analytics?days='+Number(document.getElementById('periodSelect')?.value||30))}catch(e){t={spend:0,clicks:0,leads:0,sales:0}}const days=Number(document.getElementById('periodSelect')?.value||30),factor=1;document.getElementById('anSpend').textContent=t.spend?money(t.spend*factor):'—';document.getElementById('anLeads').textContent=t.leads?fmt(t.leads*factor):'—';document.getElementById('anCpl').textContent=t.leads?money(t.spend/t.leads):'—';document.getElementById('anSales').textContent=t.sales?fmt(t.sales*factor):'—';document.getElementById('fClicks').textContent=fmt(t.clicks*factor);document.getElementById('fLeads').textContent=fmt(t.leads*factor);document.getElementById('fSales').textContent=fmt(t.sales*factor);document.getElementById('fConv').textContent=t.leads?(t.sales/t.leads*100).toLocaleString('ru-RU',{maximumFractionDigits:1})+'%':'—';bars('analyticsBars','spend');}
+async function updateAnalytics(){
+ let t;
+ try { t=await api('/api/analytics?days='+Number(document.getElementById('periodSelect')?.value||30)); }
+ catch(e) { t={spend:0,clicks:0,leads:0,sales:0,channels:[]}; }
+ const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+ put('anSpend',t.spend?money(t.spend):'—');
+ put('anLeads',t.leads?fmt(t.leads):'—');
+ put('anCpl',t.leads?money(t.spend/t.leads):'—');
+ put('anSales',t.sales?fmt(t.sales):'—');
+ put('fClicks',fmt(t.clicks));
+ put('fLeads',fmt(t.leads));
+ put('fSales',fmt(t.sales));
+ put('fConv',t.leads?(t.sales/t.leads*100).toLocaleString('ru-RU',{maximumFractionDigits:1})+'%':'—');
+ const target=document.getElementById('analyticsBars');
+ const channels=(t.channels||[]).filter(c=>Number(c.spend)>0);
+ if(!target)return;
+ if(!channels.length){target.innerHTML='<div class="empty" style="display:block">Нет расходов за выбранный период. Импортируйте CSV-отчёт с колонками channel, spend, clicks, leads, sales.</div>';return;}
+ const max=Math.max(...channels.map(c=>Number(c.spend)||0),1);
+ target.innerHTML=channels.map(c=>'<div class="barrow"><div class="barlabel">'+escapeHtml(c.channel)+'</div><div class="bartrack"><div class="bar" style="width:'+Math.max(1,(Number(c.spend)||0)/max*100)+'%"></div></div><div class="barvalue">'+fmt(c.spend/1000)+'к</div></div><div class="smallmuted" style="margin:-10px 0 12px 105px">Клики: '+fmt(c.clicks)+' · Лиды: '+fmt(c.leads)+' · Продажи: '+fmt(c.sales)+'</div>').join('');
+}
 function go(id){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.section===id));if(id==='analytics')updateAnalytics();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>go(n.dataset.section)));
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
@@ -173,7 +192,7 @@ document.getElementById('addProfileForm').addEventListener('submit',async e=>{
 });
 function updatePeriod(){updateAnalytics();toast('Период аналитики обновлён по импортированным данным.')}
 async function exportCSV(){try{const d=await api('/api/export');const blob=new Blob(['\uFEFF'+d.csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='kontur-prisutstviya.csv';a.click();URL.revokeObjectURL(url);toast('CSV выгружен из локальной базы')}catch(e){toast('Запустите backend, чтобы выгрузить актуальные данные')}}
-document.getElementById('csvFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const result=await api('/api/import',{method:'POST',body:JSON.stringify({filename:file.name,csv:String(reader.result||'')})});document.getElementById('importResult').textContent=`Импортировано строк: ${result.imported}. Данные сохранены в локальной базе.`;toast('Импорт завершён')}catch(err){document.getElementById('importResult').textContent='Не удалось импортировать: '+err.message}};reader.readAsText(file)});
+document.getElementById('csvFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const result=await api('/api/import',{method:'POST',body:JSON.stringify({filename:file.name,csv:String(reader.result||'')})});document.getElementById('importResult').textContent=`Импортировано строк: ${result.imported}. Данные сохранены в базе текущего развёртывания.`;await updateAnalytics();toast('Импорт завершён; аналитика обновлена')}catch(err){document.getElementById('importResult').textContent='Не удалось импортировать: '+err.message}};reader.readAsText(file)});
 renderRows();renderInsights();updateAnalytics();buildSearchLinks();
 async function loadProfiles(){try{const d=await api('/api/profiles');const tbody=document.getElementById('userProfiles');if(!d.profiles.length){tbody.innerHTML='<tr><td colspan="3" class="smallmuted">Пока ничего не добавлено.</td></tr>';return}tbody.innerHTML=d.profiles.map(p=>`<tr><td>${escapeHtml(p.platform||'Другое')}</td><td><a class="link" href="${safeUrl(p.url)}" target="_blank" rel="noopener">${escapeHtml(p.url)}</a></td><td><button class="btn ghost small" onclick="deleteProfile(${p.id})">Удалить</button></td></tr>`).join('')}catch(e){}}
 async function deleteProfile(id){try{await api('/api/profiles/'+id,{method:'DELETE'});await loadProfiles();toast('Профиль удалён')}catch(e){toast('Не удалось удалить профиль')}}
