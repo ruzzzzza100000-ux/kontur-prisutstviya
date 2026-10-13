@@ -136,7 +136,7 @@ class Handler(SimpleHTTPRequestHandler):
                     with urllib.request.urlopen(req, timeout=12) as resp:
                         page = resp.read().decode("utf-8", errors="replace")
                     results = []
-                    blocks = re.findall(r'<div class="result[^"]*".*?</div>\\s*</div>', page, flags=re.S)
+                    blocks = re.findall(r'<div class="result[^"]*".*?</div>\s*</div>', page, flags=re.S)
                     for block in blocks[:10]:
                         m = re.search(r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>(.*?)</a>', block, flags=re.S)
                         if not m:
@@ -148,7 +148,7 @@ class Handler(SimpleHTTPRequestHandler):
                             except Exception: pass
                         if not link.startswith(("http://", "https://")): continue
                         title = re.sub(r"<[^>]+>", "", m.group(2))
-                        title = html.unescape(re.sub(r"\\s+", " ", title)).strip()
+                        title = html.unescape(re.sub(r"\s+", " ", title)).strip()
                         sm = re.search(r'class="result__snippet"[^>]*>(.*?)</(?:a|td|div)>', block, flags=re.S)
                         desc = html.unescape(re.sub(r"<[^>]+>", "", sm.group(1))).strip() if sm else ""
                         results.append({"title": title, "url": link, "description": desc, "source": "DuckDuckGo"})
