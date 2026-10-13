@@ -3,6 +3,8 @@
 import csv
 import io
 import json
+import re
+import html
 import os
 import sqlite3
 import urllib.parse
@@ -126,11 +128,43 @@ class Handler(SimpleHTTPRequestHandler):
             search_text = query if typ == "site" else f'"{query}"'
             if city: search_text += " " + city
             if not BRAVE_KEY:
-                return send_json(self, 200, {
-                    "results": [],
-                    "message": "Автоматический поиск не настроен: добавьте BRAVE_SEARCH_API_KEY. Используйте поисковые ссылки в интерфейсе.",
-                    "search_configured": False
-                })
+                # Free public web search fallback. Availability and anti-bot rules vary;
+                # results are candidates, not verified company ownership.
+                try:
+                    ddg_url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": search_text})
+                    req = urllib.request.Request(ddg_url, headers={"User-Agent": "Mozilla/5.0 (compatible; KonturPresenceMVP/0.2)", "Accept-Language": "ru,en;q=0.8"})
+                    with urllib.request.urlopen(req, timeout=12) as resp:
+                        page = resp.read().decode("utf-8", errors="replace")
+                    results = []
+                    blocks = re.findall(r'<div class="result[^"]*".*?</div>\\s*</div>', page, flags=re.S)
+                    for block in blocks[:10]:
+                        m = re.search(r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>(.*?)</a>', block, flags=re.S)
+                        if not m:
+                            m = re.search(r'<a[^>]+href="([^"]+)"[^>]+class="result__a"[^>]*>(.*?)</a>', block, flags=re.S)
+                        if not m: continue
+                        link = html.unescape(m.group(1))
+                        if "uddg=" in link:
+                            try: link = urllib.parse.parse_qs(urllib.parse.urlparse(link).query).get("uddg", [link])[0]
+                            except Exception: pass
+                        if not link.startswith(("http://", "https://")): continue
+                        title = re.sub(r"<[^>]+>", "", m.group(2))
+                        title = html.unescape(re.sub(r"\\s+", " ", title)).strip()
+                        sm = re.search(r'class="result__snippet"[^>]*>(.*?)</(?:a|td|div)>', block, flags=re.S)
+                        desc = html.unescape(re.sub(r"<[^>]+>", "", sm.group(1))).strip() if sm else ""
+                        results.append({"title": title, "url": link, "description": desc, "source": "DuckDuckGo"})
+                    return send_json(self, 200, {
+                        "results": results,
+                        "message": f"Найдено кандидатов: {len(results)} через бесплатный веб-поиск. Совпадения нужно подтвердить вручную.",
+                        "search_configured": False,
+                        "provider": "duckduckgo"
+                    })
+                except Exception as e:
+                    return send_json(self, 200, {
+                        "results": [],
+                        "message": "Бесплатный поисковый источник недоступен с сервера. Откройте персональные поисковые ссылки ниже; для стабильного автопоиска подключите Search API.",
+                        "search_configured": False,
+                        "detail": str(e)
+                    })
             try:
                 url = "https://api.search.brave.com/res/v1/web/search?" + urllib.parse.urlencode({"q": search_text, "count": 10})
                 req = urllib.request.Request(url, headers={"Accept": "application/json", "X-Subscription-Token": BRAVE_KEY, "User-Agent": "KonturPresenceMVP/0.1"})
